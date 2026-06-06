@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FY26 Australian Tax Minimizer</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>FY26 Australian Tax Minimizer</h1>
+    <p>Financial Year 2025–26 &nbsp;|&nbsp; All data stays in your browser</p>
+  </div>
+  <span class="badge">CERTIFIED AU TAX</span>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="income">1. Income</button>
+  <button class="tab" data-tab="deductions">2. Deductions</button>
+  <button class="tab" data-tab="super">3. Super &amp; Other</button>
+  <button class="tab" data-tab="results">4. Results &amp; Advice</button>
+</nav>
+
+<main>
+
+  <!-- ══════════════ INCOME TAB ══════════════ -->
+  <section id="tab-income" class="tab-content active">
+
+    <div class="card">
+      <h3>Upload Tax Documents (PDF)</h3>
+      <div class="upload-zone" id="dropzone">
+        <div class="icon">📄</div>
+        <p><strong>Drag &amp; drop a PDF here</strong> or click to browse</p>
+        <p style="margin-top:6px;font-size:12px;">ATO Income Statement, Payment Summary, Dividend Statement, Rental Statement</p>
+        <input type="file" id="pdfInput" accept=".pdf">
+      </div>
+      <div class="parsed-preview" id="parsedPreview"></div>
+    </div>
+
+    <div class="card">
+      <h3>Employment Income</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Gross Salary / Wages</label>
+          <input type="number" data-key="salary" placeholder="0" min="0">
+          <div class="hint">Total before tax (from payslip or ATO Income Statement)</div>
+        </div>
+        <div class="field">
+          <label>Tax Withheld (PAYG)</label>
+          <input type="number" data-key="taxWithheld" placeholder="0" min="0">
+          <div class="hint">Total tax withheld by employer(s) for FY26</div>
+        </div>
+        <div class="field">
+          <label>Other Taxable Income</label>
+          <input type="number" data-key="otherIncome" placeholder="0" min="0">
+          <div class="hint">Freelance, ABN, allowances, foreign income</div>
+        </div>
+        <div class="field">
+          <label>Your Age (at 30 June 2026)</label>
+          <input type="number" data-key="age" placeholder="0" min="18" max="100">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Investment Income</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Dividends (Unfranked / Cash)</label>
+          <input type="number" data-key="dividends" placeholder="0" min="0">
+          <div class="hint">Unfranked dividend amount only</div>
+        </div>
+        <div class="field">
+          <label>Franking Credits Attached</label>
+          <input type="number" data-key="dividendsFranked" placeholder="0" min="0">
+          <div class="hint">From dividend statements — offsets tax payable</div>
+        </div>
+        <div class="field">
+          <label>Interest Income</label>
+          <input type="number" data-key="otherIncome" placeholder="0" min="0">
+          <div class="hint">Bank account interest, term deposits</div>
+        </div>
+        <div class="field">
+          <label>Capital Gain (Net)</label>
+          <input type="number" data-key="capitalGains" placeholder="0" min="0">
+          <div class="hint">Total proceeds minus cost base</div>
+        </div>
+        <div class="field">
+          <label>50% CGT Discount Applies?</label>
+          <select data-key="capitalGainsDiscount">
+            <option value="false">No (held &lt; 12 months)</option>
+            <option value="true">Yes (held &gt; 12 months)</option>
+          </select>
+          <div class="hint">Assets held &gt;12 months qualify for 50% discount</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Rental / Property Income</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Gross Rental Income</label>
+          <input type="number" data-key="rentalIncome" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Total Rental Expenses</label>
+          <input type="number" data-key="rentalExpenses" placeholder="0" min="0">
+          <div class="hint">Interest, rates, insurance, repairs, depreciation, agent fees</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Upload Bulk Transactions (CSV)</h3>
+      <p style="font-size:13px;color:#718096;margin-bottom:12px;">
+        Optional: upload a CSV with columns <strong>Type, Amount</strong> (e.g. bank export)
+      </p>
+      <input type="file" id="csvInput" accept=".csv" style="font-size:13px;">
+    </div>
+
+    <button class="btn-primary" onclick="switchTab('deductions')">Next: Deductions →</button>
+  </section>
+
+  <!-- ══════════════ DEDUCTIONS TAB ══════════════ -->
+  <section id="tab-deductions" class="tab-content">
+
+    <div class="card">
+      <h3>Work-Related Deductions</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Work From Home Expenses</label>
+          <input type="number" data-key="workExpenses" placeholder="0" min="0">
+          <div class="hint">67c/hr fixed rate method — multiply hrs × 67c</div>
+        </div>
+        <div class="field">
+          <label>Car / Travel (work)</label>
+          <input type="number" data-key="workExpenses" placeholder="0" min="0">
+          <div class="hint">Logbook method or 85c/km cents per km (up to 5,000km)</div>
+        </div>
+        <div class="field">
+          <label>Tools, Equipment, Uniforms</label>
+          <input type="number" data-key="workExpenses" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Professional Memberships / Subscriptions</label>
+          <input type="number" data-key="workExpenses" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Self-Education Expenses</label>
+          <input type="number" data-key="selfEducation" placeholder="0" min="0">
+          <div class="hint">Courses, books, conferences directly related to current job</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Investment Deductions</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Investment Loan Interest</label>
+          <input type="number" data-key="investmentExpenses" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Tax Agent / Accountant Fees</label>
+          <input type="number" data-key="investmentExpenses" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Income Protection Insurance Premium</label>
+          <input type="number" data-key="otherDeductions" placeholder="0" min="0">
+          <div class="hint">Only if held outside super</div>
+        </div>
+        <div class="field">
+          <label>Other Investment Expenses</label>
+          <input type="number" data-key="investmentExpenses" placeholder="0" min="0">
+          <div class="hint">Brokerage, financial advice, journals</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Gifts &amp; Donations</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>DGR Donations</label>
+          <input type="number" data-key="donations" placeholder="0" min="0">
+          <div class="hint">Donations ≥$2 to ATO-approved DGR organisations only</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="switchTab('super')">Next: Super &amp; Other →</button>
+  </section>
+
+  <!-- ══════════════ SUPER TAB ══════════════ -->
+  <section id="tab-super" class="tab-content">
+
+    <div class="card">
+      <h3>Superannuation</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Employer Super Contributions (SG)</label>
+          <input type="number" data-key="employerSuper" placeholder="0" min="0">
+          <div class="hint">11.5% of salary for FY26 — check your payslip</div>
+        </div>
+        <div class="field">
+          <label>Salary Sacrifice (Extra Super)</label>
+          <input type="number" data-key="superCC" placeholder="0" min="0">
+          <div class="hint">Additional pre-tax contributions arranged with employer</div>
+        </div>
+        <div class="field">
+          <label>Personal Deductible Contributions</label>
+          <input type="number" data-key="superCC" placeholder="0" min="0">
+          <div class="hint">Paid directly to fund, notice of intent lodged</div>
+        </div>
+        <div class="field">
+          <label>Total Super Balance (at 30 Jun 2025)</label>
+          <input type="number" data-key="superBalance" placeholder="0" min="0">
+          <div class="hint">Check your myGov / ATO Online — needed for catch-up eligibility</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:#f7fafc;border-radius:8px;font-size:13px;color:#4a5568;">
+        <strong>FY26 Super Caps:</strong> Concessional (pre-tax) cap = <strong>$30,000</strong> &nbsp;|&nbsp;
+        Non-concessional (after-tax) cap = <strong>$120,000</strong> &nbsp;|&nbsp;
+        Bring-forward (3-year) = <strong>$360,000</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Health &amp; Family</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Private Hospital Cover?</label>
+          <select data-key="hasPrivateHealth">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+          <div class="hint">Affects Medicare Levy Surcharge (income &gt; $93,000)</div>
+        </div>
+        <div class="field">
+          <label>Family Size (dependants)</label>
+          <input type="number" data-key="familySize" placeholder="1" min="1">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="switchTab('results')">Calculate &amp; View Results →</button>
+  </section>
+
+  <!-- ══════════════ RESULTS TAB ══════════════ -->
+  <section id="tab-results" class="tab-content">
+
+    <div class="result-summary">
+      <div class="stat-box">
+        <div class="label">Taxable Income</div>
+        <div class="value blue" id="res-taxable">$0</div>
+        <div class="sub">FY2025–26</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Total Tax Payable</div>
+        <div class="value red" id="res-tax">$0</div>
+        <div class="sub">Inc. Medicare Levy</div>
+      </div>
+      <div class="stat-box">
+        <div class="label" id="res-refund-label">Estimated Refund</div>
+        <div class="value green" id="res-refund">$0</div>
+        <div class="sub">vs. PAYG withheld</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Effective Tax Rate</div>
+        <div class="value" id="res-rate">0%</div>
+        <div class="sub">on taxable income</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Tax Breakdown</h3>
+      <table class="bracket-table">
+        <thead><tr><th>Item</th><th>Amount</th></tr></thead>
+        <tbody id="breakdown"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>FY26 Tax Brackets Reference</h3>
+      <table class="bracket-table">
+        <thead>
+          <tr><th>Taxable Income</th><th>Marginal Rate</th><th>Tax on Excess</th></tr>
+        </thead>
+        <tbody>
+          <tr class="bracket-row" data-min="0"><td>$0 – $18,200</td><td>0%</td><td>Nil</td></tr>
+          <tr class="bracket-row" data-min="18201"><td>$18,201 – $45,000</td><td>19%</td><td>19c per $1 over $18,200</td></tr>
+          <tr class="bracket-row" data-min="45001"><td>$45,001 – $120,000</td><td>32.5%</td><td>$5,092 + 32.5c per $1 over $45,000</td></tr>
+          <tr class="bracket-row" data-min="120001"><td>$120,001 – $180,000</td><td>37%</td><td>$29,467 + 37c per $1 over $120,000</td></tr>
+          <tr class="bracket-row" data-min="180001"><td>$180,001+</td><td>45%</td><td>$51,667 + 45c per $1 over $180,000</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:12px;color:#718096;">
+        + Medicare Levy 2% &nbsp;|&nbsp; LITO up to $700 &nbsp;|&nbsp; Super SG rate 11.5%
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Personalised Tax Minimization Advice</h3>
+      <ul class="advice-list" id="advice-list">
+        <div class="empty-state">
+          <div class="icon">💡</div>
+          <p>Complete the Income and Deductions tabs, then click here to see advice.</p>
+        </div>
+      </ul>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This tool provides general Australian tax information for FY2025–26 based on current ATO guidelines. It is not a substitute for professional tax advice tailored to your individual circumstances. Tax laws can change. Always verify with a registered tax agent (Tax Practitioners Board) before lodging your return. This tool does not store or transmit any of your data.
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(s => {
+    s.classList.toggle('active', s.id === 'tab-' + name);
+  });
+  if (name === 'results') renderResults();
+}
+</script>
+<script src="app.js"></script>
+</body>
+</html>
