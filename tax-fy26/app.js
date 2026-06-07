@@ -1,15 +1,15 @@
-// FY2026 Australian Tax Constants
+// FY2026 Australian Tax Constants — resident individual rates incl. Stage 3 cuts (unchanged FY24-25 → FY25-26)
 const FY = '2025–26';
 const BRACKETS = [
   { min: 0,      max: 18200,   base: 0,     rate: 0     },
-  { min: 18201,  max: 45000,   base: 0,     rate: 0.19  },
-  { min: 45001,  max: 120000,  base: 5092,  rate: 0.325 },
-  { min: 120001, max: 180000,  base: 29467, rate: 0.37  },
-  { min: 180001, max: Infinity,base: 51667, rate: 0.45  },
+  { min: 18201,  max: 45000,   base: 0,     rate: 0.16  },
+  { min: 45001,  max: 135000,  base: 4288,  rate: 0.30  },
+  { min: 135001, max: 190000,  base: 31288, rate: 0.37  },
+  { min: 190001, max: Infinity,base: 51638, rate: 0.45  },
 ];
 const MEDICARE_RATE = 0.02;
-const MEDICARE_SHADE_IN_THRESHOLD = 26000;  // FY26 approx
-const MEDICARE_SHADE_IN_FAMILY = 43846;
+const MEDICARE_SHADE_IN_THRESHOLD = 27222;  // FY24-25 ATO figure; FY26 figure indexed slightly higher (TBC by ATO)
+const MEDICARE_SHADE_IN_FAMILY = 45907;
 const MLS_THRESHOLD = 93000;
 const MLS_TIERS = [
   { threshold: 144001, rate: 0.015 },
