@@ -65,12 +65,13 @@ function fmtPct(n) {
 
 // State
 const state = {
-  salary: 0, otherIncome: 0, dividends: 0, dividendsFranked: 0,
+  salary: 0, otherIncome: 0, interestIncome: 0, dividends: 0, dividendsFranked: 0,
   rentalIncome: 0, rentalExpenses: 0,
   capitalGains: 0, capitalGainsDiscount: false,
-  workExpenses: 0, donations: 0, investmentExpenses: 0,
+  workExpenses: 0, carExpenses: 0, toolsExpenses: 0, membershipExpenses: 0,
+  donations: 0, investmentExpenses: 0, taxAgentFees: 0, otherInvestmentExpenses: 0,
   selfEducation: 0, otherDeductions: 0,
-  superBalance: 0, superCC: 0, employerSuper: 0,
+  superBalance: 0, superCC: 0, personalSuperContrib: 0, employerSuper: 0,
   age: 0, hasPrivateHealth: false, familySize: 1,
   taxWithheld: 0,
 };
@@ -101,9 +102,14 @@ document.querySelectorAll('[data-key]').forEach(el => {
   });
 });
 
-// PDF Upload
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// PDF Upload — guarded so a failed CDN load can't crash the rest of the app
+const PDF_LIB_READY = (typeof pdfjsLib !== 'undefined');
+if (PDF_LIB_READY) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+} else {
+  console.warn('pdf.js failed to load from CDN — PDF parsing disabled. Likely no internet connection. CSV upload and manual entry still work.');
+}
 
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('pdfInput');
@@ -123,6 +129,10 @@ async function handleFile(file) {
   if (!file) return;
   if (file.type !== 'application/pdf') {
     alert('Please upload a PDF file.');
+    return;
+  }
+  if (!PDF_LIB_READY) {
+    alert('PDF reading library could not be loaded (this requires an internet connection on first use). Please enter your figures manually in the form fields, or try again while online.');
     return;
   }
 
@@ -161,7 +171,7 @@ function parsePdfText(text) {
     }
   };
 
-  set('salary',      extractNum(text, /gross\s+(?:income|salary|wages)[:\s]+\$?([\d,]+)/i, /total\s+tax\s+withheld[:\s]+\$?([\d,]+)/i, /gross\s+payment[:\s]+\$?([\d,]+)/i), 'Gross Income/Salary');
+  set('salary',      extractNum(text, /gross\s+(?:income|salary|wages)[:\s]+\$?([\d,]+)/i, /gross\s+payment[:\s]+\$?([\d,]+)/i), 'Gross Income/Salary');
   set('taxWithheld', extractNum(text, /tax\s+withheld[:\s]+\$?([\d,]+)/i, /amount\s+withheld[:\s]+\$?([\d,]+)/i), 'Tax Withheld');
   set('dividends',   extractNum(text, /(?:total\s+)?dividends?[:\s]+\$?([\d,]+)/i, /unfranked\s+amount[:\s]+\$?([\d,]+)/i), 'Dividends');
   set('dividendsFranked', extractNum(text, /franked\s+amount[:\s]+\$?([\d,]+)/i, /franking\s+credit[:\s]+\$?([\d,]+)/i), 'Franking Credits');
@@ -186,11 +196,13 @@ function setField(key, val) {
 function renderResults() {
   const s = state;
 
-  const grossIncome = s.salary + s.otherIncome + s.dividends + s.dividendsFranked
+  const grossIncome = s.salary + s.otherIncome + s.interestIncome + s.dividends + s.dividendsFranked
     + Math.max(0, s.rentalIncome - s.rentalExpenses)
     + (s.capitalGains * (s.capitalGainsDiscount ? 0.5 : 1));
 
-  const totalDeductions = s.workExpenses + s.donations + s.investmentExpenses
+  const workRelatedTotal = s.workExpenses + s.carExpenses + s.toolsExpenses + s.membershipExpenses;
+  const investmentTotal = s.investmentExpenses + s.taxAgentFees + s.otherInvestmentExpenses;
+  const totalDeductions = workRelatedTotal + s.donations + investmentTotal
     + s.selfEducation + s.otherDeductions;
 
   const taxableIncome = Math.max(0, grossIncome - totalDeductions);
@@ -235,7 +247,7 @@ function renderResults() {
 
   // Advice
   const adviceEl = document.getElementById('advice-list');
-  const tips = generateAdvice(s, taxableIncome, bracket, totalTax, mls);
+  const tips = generateAdvice(s, taxableIncome, bracket, totalTax, mls, workRelatedTotal);
   if (tips.length === 0) {
     adviceEl.innerHTML = `<div class="empty-state"><div class="icon">✅</div><p>You appear to be well optimised. Enter more details for tailored advice.</p></div>`;
   } else {
@@ -250,12 +262,12 @@ function renderResults() {
   }
 }
 
-function generateAdvice(s, taxable, bracket, totalTax, mls) {
+function generateAdvice(s, taxable, bracket, totalTax, mls, workRelatedTotal) {
   const tips = [];
   const rate = bracket.rate;
 
   // 1. Super concessional contributions
-  const totalCC = s.employerSuper + s.superCC;
+  const totalCC = s.employerSuper + s.superCC + s.personalSuperContrib;
   const ccRoom  = SUPER_CC_CAP - totalCC;
   if (ccRoom > 1000 && taxable > 18200) {
     const saving = Math.min(ccRoom, taxable - 18200) * rate;
@@ -288,7 +300,7 @@ function generateAdvice(s, taxable, bracket, totalTax, mls) {
   }
 
   // 4. Work from home deductions
-  if (s.workExpenses < 500 && s.salary > 0) {
+  if (workRelatedTotal < 500 && s.salary > 0) {
     tips.push({
       priority: 'medium',
       title: 'Claim Work-Related Deductions',
