@@ -176,34 +176,35 @@
 cd leantengyew.github.io/reel-downloader
 pip install -r requirements.txt</code></pre>
             <p class="note">The <code>pip install</code> step is optional. It adds yt-dlp, which
-                keeps up with Facebook's frequent page changes and makes downloads far more
-                reliable.</p>
+                keeps up with Facebook's frequent page changes, makes downloads far more reliable,
+                and unlocks the full quality list. The app's header shows which engine is live.</p>
         </section>
 
         <section>
-            <h2>On your computer</h2>
-            <pre><code>python3 reeldl.py https://www.facebook.com/reel/123456789</code></pre>
-            <p>The video is saved to a <code>downloads</code> folder next to the script. Add
-                <code>-o ~/Movies</code> to save elsewhere, or <code>--audio-only</code> for MP3.</p>
-        </section>
-
-        <section>
-            <h2>On your phone</h2>
-            <p><span class="step">1</span>Start the server on your computer:</p>
-            <pre><code>python3 reeldl.py serve</code></pre>
-            <p><span class="step">2</span>It prints an address like
-                <code>http://192.168.1.42:8080</code>. Open that on your phone, on the same Wi-Fi.</p>
-            <p><span class="step">3</span>In the Facebook app, tap <strong>Share → Copy link</strong>
-                on the reel, paste it into the page, and tap <strong>Download</strong>, then
-                <strong>Save to device</strong>.</p>
+            <h2>Run it</h2>
+            <pre><code>python3 reeldl.py</code></pre>
+            <p>Your browser opens on <code>http://localhost:8080</code>. Paste a reel link, check
+                the preview, pick a quality, and download — the video plays right in the page before
+                you save it.</p>
+            <p>The app also prints a second address like <code>http://192.168.1.42:8080</code>.
+                That's the one to open on your phone, on the same Wi-Fi with the computer awake.</p>
             <ul>
-                <li><strong>iPhone:</strong> the file lands in Files → Downloads. Open it there and
-                    share it to Photos to get it into your camera roll.</li>
+                <li><strong>iPhone:</strong> tap Save, choose <strong>Download</strong>. The file
+                    lands in Files → Downloads. Open it there and share it to Photos to get it into
+                    your camera roll.</li>
                 <li><strong>Android:</strong> it goes straight to your Downloads folder.</li>
             </ul>
             <p class="note">The server has no password, so use it on a network you trust and stop it
                 with Ctrl+C when you're finished. <code>--local-only</code> restricts it to your
-                computer.</p>
+                computer, and <code>--port 8090</code> moves it if 8080 is taken.</p>
+        </section>
+
+        <section>
+            <h2>Straight from the command line</h2>
+            <p>Pass a link to skip the interface entirely:</p>
+            <pre><code>python3 reeldl.py https://www.facebook.com/reel/123456789</code></pre>
+            <p>The video is saved to a <code>downloads</code> folder next to the script. Add
+                <code>-o ~/Movies</code> to save elsewhere, or <code>--audio-only</code> for MP3.</p>
         </section>
 
         <section>
