@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reel Downloader — setup</title>
+    <meta name="description" content="Save public Facebook reels to your computer or phone.">
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #f4f5f8;
+            --card: #fff;
+            --text: #16181d;
+            --muted: #6b7280;
+            --line: #e3e5ea;
+            --accent: #1877f2;
+            --accent-text: #fff;
+            --code-bg: #1b1f27;
+            --code-text: #e6e9ef;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #101216;
+                --card: #191c22;
+                --text: #e9eaee;
+                --muted: #9aa1ad;
+                --line: #2a2e37;
+                --accent: #4c9aff;
+                --accent-text: #06131f;
+                --code-bg: #0c0e12;
+                --code-text: #dfe3ea;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px 72px;
+            background: var(--bg);
+            color: var(--text);
+            font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        main {
+            max-width: 660px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin: 0 0 6px;
+            letter-spacing: -.02em;
+        }
+
+        .lede {
+            color: var(--muted);
+            margin: 0 0 32px;
+        }
+
+        h2 {
+            font-size: 1.05rem;
+            margin: 0 0 12px;
+            letter-spacing: -.01em;
+        }
+
+        section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 16px;
+        }
+
+        p {
+            margin: 0 0 12px;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+
+        ol, ul {
+            margin: 0 0 12px;
+            padding-left: 22px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            border-radius: 10px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            margin: 0 0 12px;
+            font-size: .85rem;
+            line-height: 1.55;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        p code, li code {
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            padding: 1px 5px;
+            font-size: .85em;
+        }
+
+        .step {
+            display: inline-block;
+            min-width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--accent-text);
+            font-size: .78rem;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .note {
+            border-left: 3px solid var(--accent);
+            padding-left: 14px;
+            color: var(--muted);
+            font-size: .92rem;
+        }
+
+        a {
+            color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: .85rem;
+            margin-top: 28px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>Reel Downloader</h1>
+        <p class="lede">Save public Facebook reels to your computer or phone. Runs on your own
+            machine — nothing is sent to anyone else's server.</p>
+
+        <section>
+            <h2>Why this page can't do it by itself</h2>
+            <p>Browsers block one website from fetching files off another. JavaScript running here
+                is not permitted to reach <code>facebook.com</code> at all, so a static page like
+                this one physically cannot retrieve a video.</p>
+            <p>Sites that claim otherwise are quietly sending your link to a server they operate.
+                The tool below makes your own computer that server, which takes about a minute to
+                set up and keeps your links to yourself.</p>
+        </section>
+
+        <section>
+            <h2>Setup</h2>
+            <p><span class="step">1</span>Make sure Python 3 is installed — <code>python3
+                    --version</code> in a terminal. macOS and Linux already have it;
+                on Windows get it from <a href="https://www.python.org/downloads/">python.org</a>.</p>
+            <p><span class="step">2</span>Download the tool and its recommended helper:</p>
+            <pre><code>git clone https://github.com/leantengyew/leantengyew.github.io.git
+cd leantengyew.github.io/reel-downloader
+pip install -r requirements.txt</code></pre>
+            <p class="note">The <code>pip install</code> step is optional. It adds yt-dlp, which
+                keeps up with Facebook's frequent page changes and makes downloads far more
+                reliable.</p>
+        </section>
+
+        <section>
+            <h2>On your computer</h2>
+            <pre><code>python3 reeldl.py https://www.facebook.com/reel/123456789</code></pre>
+            <p>The video is saved to a <code>downloads</code> folder next to the script. Add
+                <code>-o ~/Movies</code> to save elsewhere, or <code>--audio-only</code> for MP3.</p>
+        </section>
+
+        <section>
+            <h2>On your phone</h2>
+            <p><span class="step">1</span>Start the server on your computer:</p>
+            <pre><code>python3 reeldl.py serve</code></pre>
+            <p><span class="step">2</span>It prints an address like
+                <code>http://192.168.1.42:8080</code>. Open that on your phone, on the same Wi-Fi.</p>
+            <p><span class="step">3</span>In the Facebook app, tap <strong>Share → Copy link</strong>
+                on the reel, paste it into the page, and tap <strong>Download</strong>, then
+                <strong>Save to device</strong>.</p>
+            <ul>
+                <li><strong>iPhone:</strong> the file lands in Files → Downloads. Open it there and
+                    share it to Photos to get it into your camera roll.</li>
+                <li><strong>Android:</strong> it goes straight to your Downloads folder.</li>
+            </ul>
+            <p class="note">The server has no password, so use it on a network you trust and stop it
+                with Ctrl+C when you're finished. <code>--local-only</code> restricts it to your
+                computer.</p>
+        </section>
+
+        <section>
+            <h2>If a reel won't download</h2>
+            <p>The tool is signed in as nobody, so it only sees what a logged-out visitor sees.
+                Private, friends-only, and age- or region-restricted reels will fail, and that's
+                deliberate.</p>
+            <p>If a public reel fails, run <code>pip install -U yt-dlp</code> — Facebook changes its
+                page structure often and that update usually resolves it.</p>
+        </section>
+
+        <section>
+            <h2>Please download responsibly</h2>
+            <p>Saving a public reel to watch offline is what this is for. The person who made the
+                video still owns it, so re-uploading it or presenting it as your own isn't yours to
+                do. Facebook's terms also prohibit bulk or automated scraping — this tool
+                deliberately handles one reel at a time.</p>
+        </section>
+
+        <footer>
+            <a href="https://github.com/leantengyew/leantengyew.github.io/tree/main/reel-downloader">Source
+                and full documentation on GitHub</a>
+        </footer>
+    </main>
+</body>
+
+</html>

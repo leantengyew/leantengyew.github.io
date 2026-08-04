@@ -1,0 +1,4 @@
+# Optional, but strongly recommended: yt-dlp keeps pace with Facebook's
+# frequent page changes. Without it reeldl uses its own built-in extractor,
+# which works for many public reels but breaks more often.
+yt-dlp>=2024.1.1
